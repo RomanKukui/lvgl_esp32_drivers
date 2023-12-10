@@ -111,7 +111,7 @@ void st7789_init(void)
     st7789_send_cmd(ST7789_SWRESET);
 #endif
 
-    printf("ST7789 initialization.\n");
+    ESP_LOGI(TAG, "ST7789 initialization ...");
 
     //Send all the commands
     uint16_t cmd = 0;
@@ -132,7 +132,7 @@ void st7789_init(void)
 void st7789_enable_backlight(bool backlight)
 {
 #if ST7789_ENABLE_BACKLIGHT_CONTROL
-    printf("%s backlight.\n", backlight ? "Enabling" : "Disabling");
+    ESP_LOGI(TAG, "%s backlight.\n", backlight ? "Enabling" : "Disabling");
     uint32_t tmp = 0;
 
 #if (ST7789_BCKL_ACTIVE_LVL==1)
@@ -195,7 +195,6 @@ void st7789_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * colo
     uint32_t size = lv_area_get_width(area) * lv_area_get_height(area);
 
     st7789_send_color((void*)color_map, size * 2);
-
 }
 
 /**********************

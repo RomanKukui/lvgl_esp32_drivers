@@ -19,10 +19,11 @@
 #include "driver/i2c.h"
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include "src/lv_core/lv_refr.h"
+#include "src/core/lv_refr.h"
 #else
-#include "lvgl/src/lv_core/lv_refr.h"
+#include "lvgl/src/core/lv_refr.h"
 #endif
+
 
 /*********************
  *      DEFINES
@@ -110,7 +111,7 @@ void lvgl_driver_init(void)
     
     lvgl_spi_driver_init(TFT_SPI_HOST,
         DISP_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
-        SPI_BUS_MAX_TRANSFER_SZ, 1,
+        SPI_BUS_MAX_TRANSFER_SZ, SPI_DMA_CH_AUTO,
         DISP_SPI_IO2, DISP_SPI_IO3);
     
     disp_spi_add_device(TFT_SPI_HOST);
@@ -211,6 +212,11 @@ bool lvgl_spi_driver_init(int host,
     };
 #elif defined (CONFIG_IDF_TARGET_ESP32S2)
     assert((SPI_HOST <= host) && (HSPI_HOST >= host));
+    const char *spi_names[] = {
+        "SPI_HOST", "", ""
+    };
+#elif defined (CONFIG_IDF_TARGET_ESP32S3)
+    assert((SPI2_HOST <= host) && (SPI3_HOST >= host));
     const char *spi_names[] = {
         "SPI_HOST", "", ""
     };
