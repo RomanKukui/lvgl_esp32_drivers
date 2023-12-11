@@ -132,7 +132,7 @@ void st7789_init(void)
 void st7789_enable_backlight(bool backlight)
 {
 #if ST7789_ENABLE_BACKLIGHT_CONTROL
-    ESP_LOGI(TAG, "%s backlight.\n", backlight ? "Enabling" : "Disabling");
+    ESP_LOGI(TAG, "%s backlight ...", backlight ? "Enabling" : "Disabling");
     uint32_t tmp = 0;
 
 #if (ST7789_BCKL_ACTIVE_LVL==1)

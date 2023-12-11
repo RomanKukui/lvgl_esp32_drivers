@@ -54,11 +54,8 @@
 /* Interface and driver initialization */
 void lvgl_driver_init(void)
 {
-    ESP_LOGI(TAG, "Display hor size: %d, ver size: %d", LV_HOR_RES_MAX, LV_VER_RES_MAX);
-    ESP_LOGI(TAG, "Display buffer size: %d", DISP_BUF_SIZE);
-
 #if defined (CONFIG_LV_TFT_DISPLAY_CONTROLLER_FT81X)
-    ESP_LOGI(TAG, "Initializing SPI master for FT81X");
+    ESP_LOGI(TAG, "Initializing SPI master for FT81X ...");
 
     lvgl_spi_driver_init(TFT_SPI_HOST,
         DISP_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
@@ -76,7 +73,7 @@ void lvgl_driver_init(void)
 #endif
 
 #if defined (SHARED_SPI_BUS)
-    ESP_LOGI(TAG, "Initializing shared SPI master");
+    ESP_LOGI(TAG, "Initializing shared SPI master ...");
 
     lvgl_spi_driver_init(TFT_SPI_HOST,
         TP_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
@@ -93,7 +90,7 @@ void lvgl_driver_init(void)
 #endif
 
 #if defined (SHARED_I2C_BUS)
-    ESP_LOGI(TAG, "Initializing shared I2C master");
+    ESP_LOGI(TAG, "Initializing shared I2C master ...");
     
     lvgl_i2c_driver_init(DISP_I2C_PORT,
         DISP_I2C_SDA, DISP_I2C_SCL,
@@ -107,7 +104,7 @@ void lvgl_driver_init(void)
 
 /* Display controller initialization */
 #if defined CONFIG_LV_TFT_DISPLAY_PROTOCOL_SPI
-    ESP_LOGI(TAG, "Initializing SPI master for display");
+    ESP_LOGI(TAG, "Initializing SPI master for display ...");
     
     lvgl_spi_driver_init(TFT_SPI_HOST,
         DISP_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
@@ -118,7 +115,7 @@ void lvgl_driver_init(void)
     
     disp_driver_init();
 #elif defined (CONFIG_LV_TFT_DISPLAY_PROTOCOL_I2C)
-    ESP_LOGI(TAG, "Initializing I2C master for display");
+    ESP_LOGI(TAG, "Initializing I2C master for display ...");
     /* Init the i2c master on the display driver code */
     lvgl_i2c_driver_init(DISP_I2C_PORT,
         DISP_I2C_SDA, DISP_I2C_SCL,
@@ -132,7 +129,7 @@ void lvgl_driver_init(void)
 /* Touch controller initialization */
 #if CONFIG_LV_TOUCH_CONTROLLER != TOUCH_CONTROLLER_NONE
     #if defined (CONFIG_LV_TOUCH_DRIVER_PROTOCOL_SPI)
-        ESP_LOGI(TAG, "Initializing SPI master for touch");
+        ESP_LOGI(TAG, "Initializing SPI master for touch ...");
         
         lvgl_spi_driver_init(TOUCH_SPI_HOST,
             TP_SPI_MISO, TP_SPI_MOSI, TP_SPI_CLK,
@@ -143,7 +140,7 @@ void lvgl_driver_init(void)
         
         touch_driver_init();
     #elif defined (CONFIG_LV_TOUCH_DRIVER_PROTOCOL_I2C)
-        ESP_LOGI(TAG, "Initializing I2C master for touch");
+        ESP_LOGI(TAG, "Initializing I2C master for touch ...");
         
         lvgl_i2c_driver_init(TOUCH_I2C_PORT,
             TOUCH_I2C_SDA, TOUCH_I2C_SCL,
@@ -161,9 +158,10 @@ void lvgl_driver_init(void)
 #endif
 }
 
-/* Config the i2c master
+/**
+ * Config the I2C master
  *
- * This should init the i2c master to be used on display and touch controllers.
+ * This should init the I2C master to be used on display and touch controllers.
  * So we should be able to know if the display and touch controllers shares the
  * same i2c master.
  */
@@ -171,7 +169,7 @@ bool lvgl_i2c_driver_init(int port, int sda_pin, int scl_pin, int speed_hz)
 {
     esp_err_t err;
     
-    ESP_LOGI(TAG, "Initializing I2C master port %d...", port);
+    ESP_LOGI(TAG, "Initializing I2C master port %d ...", port);
     ESP_LOGI(TAG, "SDA pin: %d, SCL pin: %d, Speed: %d (Hz)",
         sda_pin, scl_pin, speed_hz);
     
@@ -184,11 +182,11 @@ bool lvgl_i2c_driver_init(int port, int sda_pin, int scl_pin, int speed_hz)
         .master.clk_speed   = speed_hz,
     };
 
-    ESP_LOGI(TAG, "Setting I2C master configuration...");
+    ESP_LOGI(TAG, "Setting I2C master configuration ...");
     err = i2c_param_config(port, &conf);
     assert(ESP_OK == err);
 
-    ESP_LOGI(TAG, "Installing I2C master driver...");
+    ESP_LOGI(TAG, "Installing I2C master driver ...");
     err = i2c_driver_install(port,
         I2C_MODE_MASTER,
         0, 0 /*I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE */,
@@ -198,7 +196,9 @@ bool lvgl_i2c_driver_init(int port, int sda_pin, int scl_pin, int speed_hz)
     return ESP_OK != err;
 }
 
-/* Initialize spi bus master */
+/**
+ * Initialize SPI bus master
+ */
 bool lvgl_spi_driver_init(int host,
     int miso_pin, int mosi_pin, int sclk_pin,
     int max_transfer_sz,
@@ -218,7 +218,7 @@ bool lvgl_spi_driver_init(int host,
 #elif defined (CONFIG_IDF_TARGET_ESP32S3)
     assert((SPI2_HOST <= host) && (SPI3_HOST >= host));
     const char *spi_names[] = {
-        "SPI_HOST", "", ""
+        "SPI1_HOST", "SPI2_HOST", "SPI3_HOST"
     };
 #endif
 
@@ -230,17 +230,42 @@ bool lvgl_spi_driver_init(int host,
 
     spi_bus_config_t buscfg = {
         .miso_io_num = miso_pin,
-	.mosi_io_num = mosi_pin,
-	.sclk_io_num = sclk_pin,
-	.quadwp_io_num = quadwp_pin,
-	.quadhd_io_num = quadhd_pin,
+	    .mosi_io_num = mosi_pin,
+	    .sclk_io_num = sclk_pin,
+	    .quadwp_io_num = quadwp_pin,
+	    .quadhd_io_num = quadhd_pin,
         .max_transfer_sz = max_transfer_sz
     };
 
-    ESP_LOGI(TAG, "Initializing SPI bus...");
+    ESP_LOGI(TAG, "Initializing SPI bus ...");
     esp_err_t ret = spi_bus_initialize(host, &buscfg, dma_channel);
     assert(ret == ESP_OK);
 
     return ESP_OK != ret;
+}
+
+lv_disp_t * lvgl_display_init()
+{
+    ESP_LOGI(TAG, "Display size: H %d x V %d", LV_HOR_RES_MAX, LV_VER_RES_MAX);
+    ESP_LOGI(TAG, "Display buffer size: %d (bytes)", DISP_BUF_SIZE);
+
+    /*A static or global variable to store the buffers*/
+    static lv_disp_draw_buf_t disp_buf;
+
+    /*Static or global buffer(s). The second buffer is optional*/
+    static lv_color_t buf_1[DISP_BUF_SIZE];
+    static lv_color_t buf_2[DISP_BUF_SIZE];
+
+    /*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL instead buf_2 */
+    lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, DISP_BUF_SIZE);
+
+    static lv_disp_drv_t disp_drv;          /*A variable to hold the drivers. Must be static or global.*/
+    lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+    disp_drv.draw_buf = &disp_buf;          /*Set an initialized buffer*/
+    disp_drv.flush_cb = disp_driver_flush;  /*Set a flush callback to draw to the display*/
+    disp_drv.hor_res = LV_HOR_RES_MAX;      /*Set the horizontal resolution in pixels*/
+    disp_drv.ver_res = LV_VER_RES_MAX;      /*Set the vertical resolution in pixels*/
+
+    return lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
 }
 

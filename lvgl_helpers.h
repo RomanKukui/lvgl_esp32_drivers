@@ -90,13 +90,27 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/* Initialize detected SPI and I2C bus and devices */
+/**
+ * Initialize display hardware
+ */
 void lvgl_driver_init(void);
 
-/* Initialize SPI master  */
+/**
+ * @brief Create and register buffers and LVGL display.
+ * 
+ * @todo Not sure that it is a good idea to have such loop dependency between lvgl and driver.
+ */
+lv_disp_t * lvgl_display_init();
+
+
+/**
+ * Initialize SPI master
+ */
 bool lvgl_spi_driver_init(int host, int miso_pin, int mosi_pin, int sclk_pin,
     int max_transfer_sz, int dma_channel, int quadwp_pin, int quadhd_pin);
-/* Initialize I2C master  */
+/**
+ * Initialize I2C master
+ */
 bool lvgl_i2c_driver_init(int port, int sda_pin, int scl_pin, int speed);
 
 /**********************
