@@ -196,6 +196,20 @@ menu "LVGL TFT Display controller"
         help
             Display controller protocol I2C
 
+    config LV_HOR_RES_MAX
+        int "Display horizontal resolution"
+        range 0 640
+        default 128
+        help
+            Horizontal resolution of LCD matrix
+
+    config LV_VER_RES_MAX
+        int "Display vertical resolution"
+        range 0 640
+        default 128
+        help
+            Vertical resolution of LCD matrix
+
     # Used in display init function to send display orientation commands
     choice DISPLAY_ORIENTATION
         prompt "Display orientation"
