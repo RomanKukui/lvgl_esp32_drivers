@@ -1,12 +1,12 @@
 # NOTES:
 # - default <> if <> work only when no prompt is available for the user
 
-menu "LVGL TFT Display controller"
+menu "LVGL TFT Display driver"
 
     # Predefined display configurations for multiple
     # evaluation/development boards.
     choice LV_PREDEFINED_DISPLAY
-        prompt "Select predefined display configuration"
+        prompt "Select predefined board configuration"
         default LV_PREDEFINED_DISPLAY_NONE
         help
             Select predefined display configuration
@@ -72,6 +72,12 @@ menu "LVGL TFT Display controller"
             bool "Wireless Tag WT32-SC01"
             select LV_TFT_DISPLAY_CONTROLLER_ST7796S
             select LV_TFT_DISPLAY_PROTOCOL_SPI
+        config LV_PREDEFINED_DISPLAY_T_DECK
+            bool "T-Deck"
+            select LV_TFT_DISPLAY_CONTROLLER_ST7789
+            select LV_TFT_DISPLAY_PROTOCOL_SPI
+            select LV_INVERT_COLORS
+            select LV_DISP_ST7789_SOFT_RESET
     endchoice
 
     # START of helper symbols.
@@ -186,8 +192,8 @@ menu "LVGL TFT Display controller"
     # Used in display init function to send display orientation commands
     choice DISPLAY_ORIENTATION
         prompt "Display orientation"
-        default DISPLAY_ORIENTATION_PORTRAIT if !LV_TFT_DISPLAY_CONTROLLER_SSD1306
         default DISPLAY_ORIENTATION_LANDSCAPE if LV_TFT_DISPLAY_CONTROLLER_SSD1306
+        default DISPLAY_ORIENTATION_PORTRAIT_INVERTED if LV_PREDEFINED_DISPLAY_T_DECK
         config DISPLAY_ORIENTATION_PORTRAIT
             bool "Portrait" if !LV_TFT_DISPLAY_CONTROLLER_SSD1306
         config DISPLAY_ORIENTATION_PORTRAIT_INVERTED
@@ -257,7 +263,6 @@ menu "LVGL TFT Display controller"
     prompt "Select a display controller model." if LV_PREDEFINED_DISPLAY_NONE
         help
         Select the controller for your display.
-
     config LV_TFT_DISPLAY_USER_CONTROLLER_ILI9341
         bool "ILI9341"
             select LV_TFT_DISPLAY_CONTROLLER_ILI9341
@@ -286,8 +291,8 @@ menu "LVGL TFT Display controller"
         bool "GC9A01"
             select LV_TFT_DISPLAY_CONTROLLER_GC9A01
             select LV_TFT_DISPLAY_PROTOCOL_SPI
-        config LV_TFT_DISPLAY_USER_CONTROLLER_ST7735S
-            bool "ST7735S"
+    config LV_TFT_DISPLAY_USER_CONTROLLER_ST7735S
+        bool "ST7735S"
             select LV_TFT_DISPLAY_CONTROLLER_ST7735S
             select LV_TFT_DISPLAY_PROTOCOL_SPI
     config LV_TFT_DISPLAY_USER_CONTROLLER_HX8357
@@ -299,32 +304,32 @@ menu "LVGL TFT Display controller"
             select LV_TFT_DISPLAY_CONTROLLER_SH1107
             select LV_TFT_DISPLAY_PROTOCOL_SPI
             select LV_TFT_DISPLAY_MONOCHROME
-        config LV_TFT_DISPLAY_USER_CONTROLLER_SSD1306
-            bool "SSD1306"
+    config LV_TFT_DISPLAY_USER_CONTROLLER_SSD1306
+        bool "SSD1306"
             select LV_TFT_DISPLAY_CONTROLLER_SSD1306
             select LV_TFT_DISPLAY_PROTOCOL_I2C
             select LV_TFT_DISPLAY_MONOCHROME
-        config LV_TFT_DISPLAY_USER_CONTROLLER_FT81X
-            bool "FT81X"
+    config LV_TFT_DISPLAY_USER_CONTROLLER_FT81X
+        bool "FT81X"
             select LV_TFT_DISPLAY_CONTROLLER_FT81X
             select LV_TFT_DISPLAY_PROTOCOL_SPI
-        config LV_TFT_DISPLAY_USER_CONTROLLER_IL3820
-            bool "IL3820"
+    config LV_TFT_DISPLAY_USER_CONTROLLER_IL3820
+        bool "IL3820"
             select LV_TFT_DISPLAY_CONTROLLER_IL3820
             select LV_TFT_DISPLAY_PROTOCOL_SPI
             select LV_TFT_DISPLAY_MONOCHROME
-        config LV_TFT_DISPLAY_USER_CONTROLLER_JD79653A
-            bool "JD79653A"
+    config LV_TFT_DISPLAY_USER_CONTROLLER_JD79653A
+        bool "JD79653A"
             select LV_TFT_DISPLAY_CONTROLLER_JD79653A
             select LV_TFT_DISPLAY_PROTOCOL_SPI
             select LV_TFT_DISPLAY_MONOCHROME
-        config LV_TFT_DISPLAY_USER_CONTROLLER_UC8151D
-            bool "UC8151D"
+    config LV_TFT_DISPLAY_USER_CONTROLLER_UC8151D
+        bool "UC8151D"
             select LV_TFT_DISPLAY_CONTROLLER_UC8151D
             select LV_TFT_DISPLAY_PROTOCOL_SPI
             select LV_TFT_DISPLAY_MONOCHROME
-        config LV_TFT_DISPLAY_USER_CONTROLLER_RA8875
-            bool "RA8875"
+    config LV_TFT_DISPLAY_USER_CONTROLLER_RA8875
+        bool "RA8875"
             select LV_TFT_DISPLAY_CONTROLLER_RA8875
             select LV_TFT_DISPLAY_PROTOCOL_SPI
     endchoice
@@ -451,6 +456,7 @@ menu "LVGL TFT Display controller"
         default LV_TFT_DISPLAY_SPI_VSPI if LV_PREDEFINED_DISPLAY_TTGO && \
             !IDF_TARGET_ESP32S2
         default LV_TFT_DISPLAY_SPI_FSPI if IDF_TARGET_ESP32S2
+        default LV_TFT_DISPLAY_SPI_HSPI if LV_PREDEFINED_DISPLAY_T_DECK
         help
               Select the SPI Bus the TFT Display is attached to.
 
@@ -769,6 +775,7 @@ menu "LVGL TFT Display controller"
             default 19 if LV_PREDEFINED_DISPLAY_TTGO
             default 19 if LV_PREDEFINED_DISPLAY_TTGO_CAMERA_PLUS
             default 13 if LV_PREDEFINED_DISPLAY_WT32_SC01
+            default 41 if LV_PREDEFINED_DISPLAY_T_DECK
             default 13
 
             help
@@ -777,6 +784,7 @@ menu "LVGL TFT Display controller"
         config LV_DISPLAY_USE_SPI_MISO
             bool "GPIO for MISO (Master In Slave Out)" if LV_TFT_DISPLAY_PROTOCOL_SPI
             default y if LV_PREDEFINED_PINS_TKOALA
+            default y if LV_PREDEFINED_DISPLAY_T_DECK
             help
                 Enable the MISO signal to control the display. You can disable
                 it when the display does not need MISO signal to be controlled.
@@ -788,6 +796,7 @@ menu "LVGL TFT Display controller"
             range 0 43 if IDF_TARGET_ESP32S2
 
             default 19 if LV_PREDEFINED_PINS_TKOALA
+            default 38 if LV_PREDEFINED_DISPLAY_T_DECK
             default 0
 
             help
@@ -838,6 +847,7 @@ menu "LVGL TFT Display controller"
             default 18 if LV_PREDEFINED_DISPLAY_TTGO
             default 21 if LV_PREDEFINED_DISPLAY_TTGO_CAMERA_PLUS
             default 14 if LV_PREDEFINED_DISPLAY_WT32_SC01
+            default 40 if LV_PREDEFINED_DISPLAY_T_DECK
             default 14
 
             help
@@ -866,6 +876,7 @@ menu "LVGL TFT Display controller"
             default 5 if LV_PREDEFINED_DISPLAY_TTGO
             default 12 if LV_PREDEFINED_DISPLAY_TTGO_CAMERA_PLUS
             default 15 if LV_PREDEFINED_DISPLAY_WT32_SC01
+            default 12 if LV_PREDEFINED_DISPLAY_T_DECK
             default 15
 
             help
@@ -895,6 +906,7 @@ menu "LVGL TFT Display controller"
             default 17 if LV_PREDEFINED_DISPLAY_ATAG
             default 16 if LV_PREDEFINED_DISPLAY_TTGO
             default 15 if LV_PREDEFINED_DISPLAY_TTGO_CAMERA_PLUS
+            default 11 if LV_PREDEFINED_DISPLAY_T_DECK
             default 2
 
             help
@@ -942,6 +954,7 @@ menu "LVGL TFT Display controller"
             default y if LV_PREDEFINED_DISPLAY_TTGO
             default y if LV_PREDEFINED_DISPLAY_TTGO_CAMERA_PLUS
             default y if LV_PREDEFINED_DISPLAY_WT32_SC01
+            default y if LV_PREDEFINED_DISPLAY_T_DECK
             help
                 Enable controlling the display backlight using an GPIO
 
@@ -953,6 +966,7 @@ menu "LVGL TFT Display controller"
             default y if LV_PREDEFINED_DISPLAY_TTGO
             default y if LV_PREDEFINED_DISPLAY_TTGO_CAMERA_PLUS
             default y if LV_PREDEFINED_DISPLAY_WT32_SC01
+            default y if LV_PREDEFINED_DISPLAY_T_DECK
             help
                 Some backlights are turned on with a high signal, others held low.
                 If enabled, a value of 1 will be sent to the display to enable the backlight,
@@ -974,6 +988,7 @@ menu "LVGL TFT Display controller"
             default 4 if LV_PREDEFINED_DISPLAY_TTGO
             default 2 if LV_PREDEFINED_DISPLAY_TTGO_CAMERA_PLUS
             default 23 if LV_PREDEFINED_DISPLAY_WT32_SC01
+            default 42 if LV_PREDEFINED_DISPLAY_T_DECK
             default 27
 
             help
