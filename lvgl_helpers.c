@@ -183,3 +183,28 @@ bool lvgl_spi_driver_init(int host,
 
     return ESP_OK != ret;
 }
+
+lv_disp_t * lvgl_display_init()
+{
+    ESP_LOGI(TAG, "Display size: H %d x V %d", LV_HOR_RES_MAX, LV_VER_RES_MAX);
+    ESP_LOGI(TAG, "Display buffer size: %d (bytes)", DISP_BUF_SIZE);
+
+    /*A static or global variable to store the buffers*/
+    static lv_disp_draw_buf_t disp_buf;
+
+    /*Static or global buffer(s). The second buffer is optional*/
+    static lv_color_t buf_1[DISP_BUF_SIZE];
+    static lv_color_t buf_2[DISP_BUF_SIZE];
+
+    /*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL instead buf_2 */
+    lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, DISP_BUF_SIZE);
+
+    static lv_disp_drv_t disp_drv;          /*A variable to hold the drivers. Must be static or global.*/
+    lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+    disp_drv.draw_buf = &disp_buf;          /*Set an initialized buffer*/
+    disp_drv.flush_cb = disp_driver_flush;  /*Set a flush callback to draw to the display*/
+    disp_drv.hor_res = LV_HOR_RES_MAX;      /*Set the horizontal resolution in pixels*/
+    disp_drv.ver_res = LV_VER_RES_MAX;      /*Set the vertical resolution in pixels*/
+
+    return lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
+}
