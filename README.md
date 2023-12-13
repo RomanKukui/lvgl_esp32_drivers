@@ -65,6 +65,7 @@ and sets the gpio numbers for the interface.
 | AIRcable ATAGv3           | IL3820                | SPI       | 128       | 296       |
 | TTGO T-Display            | ST7789                | SPI       | 135       | 240       |
 | TTGO Camera Plus          | ST7789                | SPI       | 240       | 240       |
+| LILYGO T-Deck             | ST7789                | SPI       | 320       | 240       |
 
 **NOTE:** See [Supported display controllers](#supported-display-controllers) for more information on display configuration.
 **NOTE:** See [Supported indev controllers](#supported-indev-controllers) for more information about indev configuration.
