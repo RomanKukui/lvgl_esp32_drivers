@@ -4,6 +4,8 @@ menu "LVGL ESP Drivers"
 
     rsource "lvgl_touch/Kconfig"
 
+    rsource "lvgl_trackball/Kconfig"
+
 endmenu
 
 menu "I2C Port Settings"

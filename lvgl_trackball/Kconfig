@@ -1,0 +1,58 @@
+menu "LVGL Trackball input device"
+
+    choice
+        prompt "Select development board"
+        default LV_TRACKBALL_NONE
+        help
+            Select the board type for automatic pin assignment.
+
+        config LV_TRACKBALL_NONE
+            bool "Not supported"
+
+        config LV_TRACKBALL_MANUAL
+            bool "Set manually"
+
+        config LV_TRACKBALL_T_DECK
+            bool "LILYGO T-Deck"
+    endchoice
+        
+    menu "Trackball pin assignment"
+        visible if LV_TRACKBALL_MANUAL
+
+        config LV_TRACKBALL_UP
+            int
+            prompt "GPIO for Up signal"
+            default 2 if LV_TRACKBALL_T_DECK
+            default -1
+            help
+                Configure the trackball Up pin here.
+
+        config LV_TRACKBALL_RIGHT
+            int "GPIO for Right signal"
+            default 15 if LV_TRACKBALL_T_DECK
+            default -1
+            help
+                Configure the trackball Right pin here.
+
+        config LV_TRACKBALL_DOWN
+            int "GPIO for Down signal"
+            default 3 if LV_TRACKBALL_T_DECK
+            default -1
+            help
+                Configure the trackball Down pin here.
+
+        config LV_TRACKBALL_LEFT
+            int "GPIO for Left signal"
+            default 1 if LV_TRACKBALL_T_DECK
+            default -1
+            help
+                Configure the trackball Left pin here.
+
+        config LV_TRACKBALL_BUTTON
+            int "GPIO for Button signal"
+            default 0 if LV_TRACKBALL_T_DECK
+            default -1
+            help
+                Configure the trackball Button pin here.    
+    endmenu
+endmenu
