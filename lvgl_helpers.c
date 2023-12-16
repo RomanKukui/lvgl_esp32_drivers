@@ -52,12 +52,7 @@
 /* Interface and driver initialization */
 void lvgl_driver_init(void)
 {
-    /* Since LVGL v8 LV_HOR_RES_MAX and LV_VER_RES_MAX are not defined, so
-     * print it only if they are defined. */
-#if (LVGL_VERSION_MAJOR < 8)
     ESP_LOGI(TAG, "Display hor size: %d, ver size: %d", LV_HOR_RES_MAX, LV_VER_RES_MAX);
-#endif
-
     ESP_LOGI(TAG, "Display buffer size: %d", DISP_BUF_SIZE);
 
 #if defined (CONFIG_LV_TFT_DISPLAY_CONTROLLER_FT81X)
@@ -70,6 +65,7 @@ void lvgl_driver_init(void)
 
     disp_spi_add_device(TFT_SPI_HOST);
     disp_driver_init();
+    lvgl_display_init();        // initialize lvgl display and buffers
 
 #if defined (CONFIG_LV_TOUCH_CONTROLLER_FT81X)
     touch_driver_init();
@@ -90,6 +86,7 @@ void lvgl_driver_init(void)
     tp_spi_add_device(TOUCH_SPI_HOST);
 
     disp_driver_init();
+    lvgl_display_init();        // initialize lvgl display and buffers
     touch_driver_init();
 
     return;
@@ -107,8 +104,10 @@ void lvgl_driver_init(void)
     disp_spi_add_device(TFT_SPI_HOST);
 
     disp_driver_init();
+    lvgl_display_init();        // initialize lvgl display and buffers
 #elif defined (CONFIG_LV_I2C_DISPLAY)
     disp_driver_init();
+    lvgl_display_init();        // initialize lvgl display and buffers
 #else
 #error "No protocol defined for display controller"
 #endif
@@ -136,6 +135,11 @@ void lvgl_driver_init(void)
     #error "No protocol defined for touch controller"
     #endif
 #else
+#endif
+
+/* Trackball initialization */
+#ifdef CONFIG_LV_TRACKBALL
+    lv_port_trackball_init();
 #endif
 }
 
